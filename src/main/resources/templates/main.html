@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <title>상품 목록</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS 추가 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Kakao 지도 API -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bf26e6c25e83b135cbf4419f00b06e16"></script>
+
+    <!-- 스크립트 블록 -->
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            function displayRemainingTime(targetDate, elementId) {
+                const now = new Date();
+                const endDate = new Date(targetDate);
+                const timeRemaining = endDate - now;
+
+                if (timeRemaining <= 0) {
+                    document.getElementById(elementId).textContent = '마감';
+                    return;
+                }
+
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                document.getElementById(elementId).textContent
+                    = `${days}일 ${hours}시간 ${minutes}분`;
+            }
+
+            function startTimer(targetDate, elementId) {
+                setInterval(() => {
+                    displayRemainingTime(targetDate, elementId);
+                }, 1000);
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.timer').forEach(timer => {
+                    const targetDate = timer.getAttribute('data-end-date');
+                    const elementId = timer.id;
+                    startTimer(targetDate, elementId);
+                });
+            });
+
+            // Kakao 지도 API 초기화 및 지도 생성
+            function initMap() {
+                var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+                var mapOption = {
+                    center: new kakao.maps.LatLng(37.491117, 126.720670), // 서울 강남구의 중심 좌표
+                    level: 3 // 지도의 확대 레벨
+                };
+
+                // 지도를 생성합니다
+                var map = new kakao.maps.Map(mapContainer, mapOption);
+
+                // 마커가 표시될 위치입니다 (예시로 서울 강남구에 마커 표시)
+                var markerPosition  = new kakao.maps.LatLng(37.491117, 126.720670);
+
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                    position: markerPosition
+                });
+
+                // 마커가 지도 위에 표시되도록 설정합니다
+                marker.setMap(map);
+
+                var iwContent = '<div style="padding:5px;">Auction Shop</div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+                    iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+                // 인포윈도우를 생성합니다
+                var infowindow = new kakao.maps.InfoWindow({
+                    content : iwContent,
+                    removable : iwRemoveable
+                });
+
+                // 마커에 마우스오버 이벤트를 등록합니다
+                kakao.maps.event.addListener(marker, 'mouseover', function() {
+                  // 마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
+                    infowindow.open(map, marker);
+                });
+
+                // 마커에 마우스아웃 이벤트를 등록합니다
+                kakao.maps.event.addListener(marker, 'mouseout', function() {
+                    // 마커에 마우스아웃 이벤트가 발생하면 인포윈도우를 제거합니다
+                    infowindow.close();
+                });
+            }
+        </script>
+    </th:block>
+
+    <!-- CSS 블록 -->
+    <th:block layout:fragment="css">
+        <style>
+            .carousel-inner > .carousel-item {
+                height: auto;
+            }
+
+            .margin {
+                margin-bottom: 30px;
+            }
+
+            .banner {
+                max-width: 100%;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+            }
+
+            .card-text {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+            .text-dark a {
+                text-decoration: none;
+            }
+
+            .text-dark a:hover {
+                text-decoration: none;
+            }
+
+            .center {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            /* 추가된 스타일 */
+            #map {
+                width: 60%;
+                height: 400px; /* 지도의 높이 조정 */
+                margin: 0 auto; /* 화면 가운데 정렬 */
+                margin-top: 200px; /* 페이지네이션과의 간격 조정 */
+            }
+
+            .pagination {
+                margin-top: 20px; /* 페이지네이션 위쪽 간격 조정 */
+                margin-bottom: 20px; /* 페이지네이션 아래쪽 간격 조정 */
+            }
+
+            /* "오시는 길" 영역 스타일 */
+            .directions {
+                margin-top: 10px; /* 지도와 "오시는 길" 사이의 간격 조정 */
+                text-align: center;
+                font-weight: bold;
+            }
+        </style>
+    </th:block>
+</head>
+
+<body onload="initMap()">
+<div layout:fragment="content">
+    <div id="carouselControls" class="carousel slide margin" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img th:src="@{/img/아이콘.png}" class="banner" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/구글로그인.png}" class="banner" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/btnW_완성형.png}" class="banner" alt="...">
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselControls" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselControls" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+
+    <!-- 검색 결과 표시 -->
+    <input type="hidden" name="searchQuery" th:value="${itemSearchDto.searchQuery}">
+    <div th:if="${not #strings.isEmpty(itemSearchDto.searchQuery)}" class="center">
+        <p class="h3 font-weight-bold" th:text="${itemSearchDto.searchQuery} + '검색결과'"></p>
+    </div>
+
+    <!-- 상품 목록 -->
+    <div class="container text-center">
+        <div class="row row-cols-5">
+            <th:block th:each="item, status: ${items.getContent()}">
+                <div class="col">
+                    <div class="card">
+                        <a th:href="'/item/' + ${item.id}" class="text-dark">
+                            <img th:src="${item.imgUrl}" class="card-img-top" th:alt="${item.itemNm}" style="max-width: 100%; height: auto;">
+                            <div class="card-body">
+                                <h4 class="card-title">[[${item.itemNm}]]</h4>
+                                <div th:id="'timer-' + ${item.id}" class="timer" th:data-end-date="${item.endDate}"></div>
+                                <h3 class="card-title text-danger">[[${item.bidPrice}]] 원</h3>
+                                <p class="card-text">[[${item.itemDetail}]]</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+
+    <!-- 페이지 네이션 -->
+    <div th:with="start=${(items.number/maxPage)*maxPage +1},
+            end=(${(items.totalPages == 0) ? 1 : (start + (maxPage-1) < items.totalPages ?
+            start + (maxPage - 1) : items.totalPages)})">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${items.number eq 0}?'disabled'">
+                <a th:href="@{'/' + '?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${items.number-1}}"
+                   aria-label='Previous' class="page-link">
+                    <span aria-hidden="true">이전</span>
+                </a>
+            </li>
+            <li class="page-item" th:each="page: ${#numbers.sequence(start,end)}"
+                th:classappend="${items.number eq page-1}?'active':''">
+                <a th:href="@{'/' + '?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' +${page -1}}"
+                   th:inline="text" class="page-link">[[${page}]]</a>
+            </li>
+            <li class="page-item" th:classappend="${items.number+1 ge items.totalPages}?'disabled'">
+                <a th:href="@{'/' + '?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${items.number + 1}}"
+                   aria-label="Next" class="page-link">
+                    <span aria-hidden="true">다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 지도 표시 -->
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+    <!-- "오시는 길" 영역 -->
+    <div class="container directions">
+        <p>오시는 길: 서울 강남구 예시동 123번지</p>
+    </div>
+</div>
+</body>
+
+</html>

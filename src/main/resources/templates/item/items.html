@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <title>상품 목록</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Thymeleaf에서 사용할 스크립트 및 CSS 추가 -->
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            // 타이머 초기화 및 남은 시간 표시 함수
+            function displayRemainingTime(targetDate, elementId) {
+                const now = new Date();
+                const endDate = new Date(targetDate);
+                const timeRemaining = endDate - now;
+
+                if (timeRemaining <= 0) {
+                    document.getElementById(elementId).textContent = '마감';
+                    return;
+                }
+
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                document.getElementById(elementId).textContent
+                    = `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+            }
+
+            // 모든 타이머 시작 함수
+            function startTimers() {
+                document.querySelectorAll('.timer').forEach(timer => {
+                    const targetDate = timer.getAttribute('data-end-date');
+                    const elementId = timer.id;
+
+                    // 초기 호출하여 화면에 뿌려주기
+                    displayRemainingTime(targetDate, elementId);
+
+                    // 1초마다 타이머 갱신
+                    setInterval(() => {
+                        displayRemainingTime(targetDate, elementId);
+                    }, 1000);
+                });
+            }
+
+            // 페이지 로드 시 타이머 시작
+            document.addEventListener('DOMContentLoaded', startTimers);
+        </script>
+    </th:block>
+
+    <th:block layout:fragment="css">
+        <style>
+            /* 필요한 CSS 스타일 추가 */
+            .carousel-inner > .item {
+                height: auto;
+            }
+
+            .margin {
+                margin-bottom: 30px;
+            }
+
+            .banner {
+                max-width: 100%;  /* 부모 요소 크기를 넘지 않도록 설정 */
+                height: auto;     /* 원본 비율을 유지 */
+                display: block;   /* block 요소로 설정 */
+                margin: 0 auto;   /* 이미지를 중앙에 정렬 */
+            }
+
+            .card-text {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                text-decoration: none;
+            }
+
+            .a:hover {
+                text-decoration: none;
+            }
+
+            .center {
+                text-align: center;
+                margin-top: 20px; /* 텍스트와 배너 이미지 사이의 간격 추가 */
+            }
+
+            .carousel-item {
+                position: relative; /* 자식 요소 배치 조정용 */
+            }
+
+            .carousel-inner {
+                padding-bottom: 50px; /* 배너 이미지와 아래 텍스트 간의 간격 */
+            }
+        </style>
+    </th:block>
+</head>
+
+<body>
+<!-- 레이아웃에 포함될 내용 -->
+<div layout:fragment="content">
+
+    <div id="carouselControls" class="carousel slide margin" data-ride="carousel">
+        <div class="carousel-inner">
+
+            <div class="carousel-item active item">
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM1}">
+                    <img th:src="@{/img/아이콘.png}" class="banner" alt="배너1">
+                </div>
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM2}">
+                    <img th:src="@{/img/구글로그인.png}" class="banner" alt="배너2">
+                </div>
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM3}">
+                    <img th:src="@{/img/btnW_완성형.png}" class="banner" alt="배너3">
+                </div>
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM4}">
+                    <img th:src="@{/img/아이콘.png}" class="banner" alt="배너4">
+                </div>
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM5}">
+                    <img th:src="@{/img/아이콘.png}" class="banner" alt="배너5">
+                </div>
+                <div th:if="${selectedItemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM6}">
+                    <img th:src="@{/img/아이콘.png}" class="banner" alt="배너6">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 검색 쿼리 및 결과 표시 -->
+    <input type="hidden" name="searchQuery" th:value="${itemSearchDto.searchQuery}">
+    <div th:if="${not #strings.isEmpty(itemSearchDto.searchQuery)}" class="center">
+        <p class="h3 font-weight-bold" th:text="${itemSearchDto.searchQuery} + ' 검색결과'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM1}" class="center">
+        <p class="h3 font-weight-bold" th:text="'크레스티드 게코 노말 목록'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM2}" class="center">
+        <p class="h3 font-weight-bold" th:text="'모프 크레스티드 게코 목록'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM3}" class="center">
+        <p class="h3 font-weight-bold" th:text="'레오파드 게코 목록'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM4}" class="center">
+        <p class="h3 font-weight-bold" th:text="'비어디 드래곤 목록'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM5}" class="center">
+        <p class="h3 font-weight-bold" th:text="'기타 게코 & 도마뱀 목록'"></p>
+    </div>
+    <div th:if="${itemSearchDto.itemValue == T(com.example.Spring_shop.constant.ItemValue).ITEM6}" class="center">
+        <p class="h3 font-weight-bold" th:text="'모니터 & 테구 목록'"></p>
+    </div>
+
+    <!-- 상품 목록 표시 -->
+    <div class="container text-center">
+        <div class="row row-cols-5">
+            <th:block th:each="item, status: ${items.getContent()}">
+                <div class="col">
+                    <div class="card">
+                        <a th:href="'/item/' + ${item.id}" class="text-dark">
+                            <img th:src="${item.imgUrl}" class="card-img-top" th:alt="${item.itemNm}" height="400">
+                            <div class="card-body">
+                                <h4 class="card-title">[[${item.itemNm}]]</h4>
+                                <div th:id="'timer-' + ${item.id}" class="timer" th:data-end-date="${item.endDate}"></div>
+                                <h3 class="card-title text-danger">[[${item.bidPrice}]] 원</h3>
+                                <p class="card-text">[[${item.itemDetail}]]</p>
+                                <div th:if="${item.price != null}">
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</div>
+</body>
+</html>

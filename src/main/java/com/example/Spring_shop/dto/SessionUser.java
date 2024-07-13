@@ -1,6 +1,6 @@
 package com.example.Spring_shop.dto;
 
-import com.example.Spring_shop.entity.User;
+import com.example.Spring_shop.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,10 +21,13 @@ public class SessionUser implements Serializable {
     private String name;
     private String email;
     private String picture;
-
-    public SessionUser(User user) {
-        this.name = user.getName();
-        this.email = user.getEmail();
-        this.picture = user.getPicture();
+    private String provider;
+    public SessionUser(Member member) {
+        this.name = member.getName();
+        this.email = member.getEmail();
+        this.picture = member.getPicture();
+        this.provider = member.getProvider();
     }
+
+
 }

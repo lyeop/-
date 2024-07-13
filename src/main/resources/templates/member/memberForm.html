@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <style>
+        body {
+            background-color: #f8f9fa; /* 깔끔한 배경색 */
+            font-family: 'Arial', sans-serif; /* 현대적인 글꼴 */
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 50px auto;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #007bff; /* 포인트 색상 */
+        }
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .fieldError {
+            color: #bd2130;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            color: #007bff;
+        }
+        .auction-icon {
+            width: 50px;
+            height: 50px;
+        }
+        .form-group {
+            margin-bottom: 15px; /* 입력 칸들 사이의 간격 조정 */
+        }
+        .btn-primary{
+            margin-top : 10px
+    </style>
+</head>
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        .fieldError {
+            color: #bd2130;
+        }
+
+    </style>
+</th:block>
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function(){
+           var errorMessage = [[${errorMessage}]];
+           if(errorMessage != null){
+               alert(errorMessage);
+           }
+        });
+
+        function mailSend(){
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
+            var mail = $("#sendmail").val();
+
+            var url = "/members/" + mail + "/emailConfirm";
+            var paramData = {
+                email: mail
+            }
+            var param = JSON.stringify(paramData);
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                contentType: "application/json",
+                data: param,
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader(header, token);
+                },
+                dataType: "json",
+                cache: false,
+                success: function(result, status){
+                    alert(result);
+                    $("#c_1").show();
+                    console.log($("#c_1"));
+                },
+                error: function(jqXHR, status, error){
+                    if(jqXHR.status == '401'){
+                        location.href = '/members/login';
+                    }
+                    else{
+                        alert(jqXHR.responseText);
+                    }
+                }
+            });
+        }
+
+        function codeCheck(){
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
+            var code = $("#codecheck").val();
+
+            var url = "/members/" + code + "/codeCheck";
+            var paramData = {
+                code: code
+            }
+            var param = JSON.stringify(paramData);
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                contentType: "application/json",
+                data: param,
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader(header, token);
+                },
+                dataType: "json",
+                cache: false,
+                success: function(result, status){
+                    alert(result);
+                },
+                error: function(jqXHR, status, error){
+                    if(jqXHR.status == '401'){
+                        location.href = '/members/new';
+                    }
+                    else{
+                        alert(jqXHR.responseText);
+                    }
+                }
+            });
+        }
+
+        function validatePasswords() {
+            var password = $("#password").val();
+            var confirmPassword = $("#confirmPassword").val();
+            if (password !== confirmPassword) {
+                $("#passwordError").show();
+                return false;
+            } else {
+                $("#passwordError").hide();
+                return true;
+            }
+        }
+    </script>
+</th:block>
+
+<div class="container" layout:fragment="content">
+    <div class="header">
+        <h2>회원 가입</h2>
+        <img th:src="@{/img/아이콘.png}" alt="경매 아이콘" class="auction-icon"> <!-- 경매 아이콘 추가 -->
+    </div>
+    <form action="/members/new" role="form" method="post" th:object="${memberFormDto}" onsubmit="return validatePasswords()">
+        <div class="form-group">
+            <label th:for="name">이름</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="이름을 입력해주세요.">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError">Incorrect data</p>
+        </div>
+        <div class="form-group">
+            <label th:for="email">이메일 주소</label>
+            <input type="text" th:field="*{email}" id="sendmail" class="form-control" placeholder="이메일을 입력해주세요.">
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="fieldError">Incorrect data</p>
+            <button class="btn btn-primary" id="e_2" type="button" onclick="mailSend()">인증 코드 요청</button>
+        </div>
+        <div class="form-group" id="c_1" >
+            <label th:for="codeCheck" class="fr_bg">인증 코드</label>
+            <input type="text" class="form-control" id="codecheck" placeholder="인증 코드 입력 후 인증 확인 버튼을 꼭 눌러주세요.">
+            <button class="btn btn-primary" id="c_2" type="button" onclick="codeCheck()">인증 코드 확인</button>
+        </div>
+        <div class="form-group">
+            <label th:for="password">비밀번호</label>
+            <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="비밀번호 입력">
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="fieldError">Incorrect data</p>
+        </div>
+        <div class="form-group">
+            <label th:for="confirmPassword">비밀번호 확인</label>
+            <input type="password" id="confirmPassword" class="form-control" placeholder="비밀번호 확인">
+            <p id="passwordError" class="fieldError" style="display:none;">비밀번호가 일치하지 않습니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="address">주소</label>
+            <input type="text" th:field="*{address}" class="form-control" placeholder="주소를 입력해주세요.">
+            <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="fieldError">Incorrect data</p>
+        </div>
+        <div class="form-group">
+            <label th:for="tel">전화번호</label>
+            <input type="text" th:field="*{tel}" class="form-control" placeholder="(-)제외한 전화번호를 입력해주세요.">
+            <p th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}" class="fieldError">Incorrect data</p>
+        </div>
+        <div style="text-align: center">
+            <button type="submit" class="btn btn-primary">가입하기</button>
+        </div>
+
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+    </form>
+</div>
+</html>

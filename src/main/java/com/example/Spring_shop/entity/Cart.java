@@ -26,4 +26,5 @@ public class Cart extends BaseEntity{
         cart.setMember(member);
         return cart;
     }
+
 }

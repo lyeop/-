@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+
+<div class="container" layout:fragment="content">
+    <div class="header">
+        <h2>게시판</h2>
+        <!-- 테이블 출력 -->
+        <table>
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>작성자</th>
+                <th>제목</th>
+                <th>조회</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- dtos 변수를 반복하여 테이블 행을 생성합니다. -->
+            <tr th:each="dto : ${dtos}">
+                <td th:text="${dto.id}" ></td>
+                <td th:text="${dto.writer}" ></td>
+                <td th:text="${dto.title}"></td>
+                <td><a th:href="@{/view/{id}(id=${dto.id})}">조회</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <p><a href="/customerCenter/write">글 작성</a></p>
+    </div>
+</div>
+</html>

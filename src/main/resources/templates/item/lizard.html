@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>이미지</th>
+      <th>제목</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="lizard : ${lizardList}">
+      <td><a th:href="${lizard.url}"><img th:src="${lizard.image}" alt="lizard image"></a></td>
+      <td><a th:href="${lizard.url}" th:text="${lizard.subject}"></a></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

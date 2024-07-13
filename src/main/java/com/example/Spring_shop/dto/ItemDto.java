@@ -14,7 +14,9 @@ public class ItemDto {
     private String itemDetail;
     private String sellStatCd;
     private String itemValue;
+    private Integer BidPrice;
     private LocalDateTime regTime;
     private LocalDateTime updateTime;
+    private Integer startingBidPrice;
 
 }

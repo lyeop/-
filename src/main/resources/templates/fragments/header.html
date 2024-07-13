@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+</head>
+<body>
+<div th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img th:src="@{/img/아이콘.png}" alt="경매 아이콘" width="30" height="30" class="d-inline-block align-top">
+                AuctionShop
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown order-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                            관리자 메뉴
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                                <a class="dropdown-item" href="/admin/item/new">상품 등록</a>
+                            </li>
+                            <li sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                                <a class="dropdown-item" href="/admin/items">상품 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <style>
+                        .dropdown-menu .nav-link {
+                            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+                            overflow: hidden; /* 넘치는 부분 감춤 */
+                            text-overflow: ellipsis; /* 넘치는 부분에 대해 ... 표시 */
+                        }
+                    </style>
+
+                    <li class="nav-item dropdown order-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="itemDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            상품 목록
+                        </a>
+                        <ul class="dropdown-menu bg-light" aria-labelledby="itemDropdown">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM1}">크레스티드 게코 노말</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM2}">모프 크레스티드 게코</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM3}">레오파드 게코</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM4}">비어디 드래곤</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM5}">기타 게코 & 도마뱀</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" th:href="@{/item/items/ITEM6}">모니터 & 테구</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item order-3" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/customerCenter">고객 센터</a>
+                    </li>
+                    <li class="nav-item order-4" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/cart">장바구니</a>
+                    </li>
+                    <li class="nav-item order-5" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/orders">구매이력</a>
+                    </li>
+                    <li class="nav-item order-6" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/item/lizard">크롤링 테스트</a>
+                    </li>
+                </ul>
+                <style>
+                    .form-control {
+                        padding: 0.15rem 0.5rem; /* 검색창의 두께를 얇게 만듭니다. */
+                        margin-left: 10px;
+                    }
+                    .btn {
+                        white-space: nowrap; /* 검색 버튼의 텍스트가 한 줄로 나오도록 설정합니다. */
+                    }
+                </style>
+                <!-- 로그아웃 및 마이페이지 링크를 검색창 왼쪽으로 이동 -->
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item order-7" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/members/mypage">마이페이지</a>
+                    </li>
+                    <li class="nav-item order-6" sec:authorize="isAnonymous()">
+                        <a class="nav-link" href="/members/login">로그인</a>
+                    </li>
+                    <li class="nav-item order-6" sec:authorize="isAnonymous()">
+                        <a class="nav-link" href="/members/findpassword">비밀번호 찾기</a>
+                    </li>
+                    <li class="nav-item order-8" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/members/logout">로그아웃</a>
+                    </li>
+                </ul>
+                <form class="d-flex" th:action="@{/}" method="get">
+                    <input name="searchQuery" class="form-control me-2" type="search" placeholder="검색" aria-label="검색">
+                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">검색</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</div>
+</body>
+</html>

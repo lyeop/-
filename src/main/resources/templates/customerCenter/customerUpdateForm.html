@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+</head>
+<style>
+    /* 폼의 전체적인 스타일 */
+    .container {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .header {
+        max-width: 800px; /* 화면에 꽉 차도록 조정 */
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="text"], textarea {
+        width: calc(100% - 20px);
+        padding: 10px; /* 내용 입력 부분 패딩 증가 */
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 200px; /* 최소 높이 설정 */
+        resize: vertical; /* 수직으로만 resize 가능하도록 설정 */
+    }
+
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+</style>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function() {
+    $('#writeForm').submit(function(event) {
+        event.preventDefault();
+
+        // 폼 데이터 및 CSRF 토큰 가져오기
+        var formData = $(this).serialize();
+        formData += '&' + encodeURIComponent('${_csrf.parameterName}') + '=' + encodeURIComponent('${_csrf.token}');
+
+        // Ajax로 데이터 전송
+        $.ajax({
+            type: 'POST',
+            url: 'write',
+            data: formData,
+            success: function(response) {
+                alert('작성 성공');
+                window.location.replace('list');
+            },
+            error: function() {
+                alert('작성 실패');
+            }
+        });
+    });
+});
+    </script>
+</th:block>
+
+
+<div class="container" layout:fragment="content">
+    <div class="header">
+        <table width="500" cellpadding="0" cellspacing="0" border="1">
+            <form role="form" class="container" method="post" enctype="multipart/form-data" th:object="${customerCenterPostFormDto}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <tr>
+                    <td>작성자</td>
+                    <td><input type="text" th:field="*{writer}"  size="100"></td>
+                </tr>
+                <tr>
+                    <td>제목</td>
+                    <td><input type="text" th:field="*{title}"  size="100"></td>
+                </tr>
+                <tr>
+                    <td>내용</td>
+                    <td><textarea th:field="*{content}" style="width: calc(100% - 20px); padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; min-height: 200px; resize: vertical;"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button th:formaction="@{'/customerCenter/updateSave/'+${customerCenterPostFormDto.id}}" type="submit" class="btn btn-primary">수정</button>
+                    </td>
+                </tr>
+            </form>
+        </table>
+    </div>
+</div>
+</html>
